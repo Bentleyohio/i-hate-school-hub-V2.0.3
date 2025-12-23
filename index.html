@@ -4,13 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>I hate school hub</title>
-
 <style>
 body {
   margin: 0;
   min-height: 100vh;
   background: black;
-  color: #00ff9c;
+  color: #00ff8c;
   font-family: "Courier New", monospace;
   display: flex;
   justify-content: center;
@@ -95,8 +94,8 @@ button:hover { background:#00ff9c; color:black; }
   <button onclick="launchBritishMan()">> british_man</button>
   <button onclick="runEliteGamez()">> elite_gamez</button>
   <button onclick="runBloxcraft()">> bloxcraft_hub</button>
-  <button onclick="runTerbiumon()">> Terbiumon</button>
-  <button onclick="runT9OS()">> T9_OS</button>
+  <button onclick="runTerbiumon()">> Terbium</button>
+  <button onclick="runTest()">> Test</button>
 
   <button class="extra-btn" onclick="openExtra()">extra</button>
   <button class="credits-btn" onclick="openCredits()">credits</button>
@@ -198,49 +197,6 @@ function runEliteGamez() {
     });
 }
 
-function runT9OS() {
-  console.log("Executing T9_OS...");
-  const win = window.open("about:blank", "_blank", "width=900,height=600");
-  if (!win) { alert("Popup blocked"); return; }
-
-  fetch("https://tableschairs.vercel.app/?t=" + Date.now())
-    .then(r => {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.text();
-    })
-    .then(html => {
-      win.document.open();
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Clever | Portal</title>
-        </head>
-        <body>
-          ${html}
-          <script>
-            setTimeout(() => {
-              var link = document.createElement("link");
-              link.rel = "icon";
-              link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=https://www.clever.com/&size=128";
-              document.head.appendChild(link);
-            }, 100);
-          <\/script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-      win.onbeforeunload = e => { e.preventDefault(); return ""; };
-    })
-    .catch(err => {
-      console.error("Fetch failed:", err);
-      win.document.open();
-      win.document.write(`<p style="color:red">Failed to load content: ${err.message}</p>`);
-      win.document.close();
-    });
-}
-
 function runBloxcraft() {
   log("Executing bloxcraft_hub...");
   const win = window.open("about:blank", "_blank", "width=900,height=600");
@@ -276,7 +232,7 @@ function runBloxcraft() {
 
 function runTerbiumon() {
   log("Executing Terbium...");
-  const win = window.open("", "_blank", "width=410,height=670");
+  const win = window.open("about:blank", "_blank", "width=410,height=670");
   if (!win) { alert("Popup blocked"); return; }
 
   win.document.open();
@@ -285,25 +241,63 @@ function runTerbiumon() {
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Clever | Portal</title>
-      <link rel="icon" href="https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128">
-      <style>
-        body { margin:0; background:black; }
-        iframe { border:none; width:100%; height:100%; }
-      </style>
+      <title>Clever l Portal</title>
     </head>
-    <body>
-      <iframe src="https://terbiumon.top/?t=${Date.now()}" allowfullscreen></iframe>
+    <body style="margin:0; background:black;">
+      <iframe src="https://terbiumon.top/?t=${Date.now()}" style="border:none;width:100%;height:100%;" allowfullscreen></iframe>
       <script>
         window.onbeforeunload = function(e) {
           e.preventDefault();
           e.returnValue = "Are you sure you want to leave this page?";
           return e.returnValue;
         };
-   
+        setTimeout(() => {
+          var link = document.createElement("link");
+          link.rel = "icon";
+          link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
+          document.head.appendChild(link);
+        }, 100);
+      <\/script>
+    </body>
+    </html>
   `);
   win.document.close();
 }
+
+function runTest() {
+  log("Executing Terbium...");
+  const win = window.open("about:blank", "_blank", "width=410,height=670");
+  if (!win) { alert("Popup blocked"); return; }
+
+  win.document.open();
+  win.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Clever l Portal</title>
+    </head>
+    <body style="margin:0; background:black;">
+      <iframe src="blooket.com?t=${Date.now()}" style="border:none;width:100%;height:100%;" allowfullscreen></iframe>
+      <script>
+        window.onbeforeunload = function(e) {
+          e.preventDefault();
+          e.returnValue = "Are you sure you want to leave this page?";
+          return e.returnValue;
+        };
+        setTimeout(() => {
+          var link = document.createElement("link");
+          link.rel = "icon";
+          link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
+          document.head.appendChild(link);
+        }, 100);
+      <\/script>
+    </body>
+    </html>
+  `);
+  win.document.close();
+}
+
 
 // ===== CREDITS =====
 function openCredits() {
@@ -348,7 +342,7 @@ function openPremiumDocs() {
     log("Overlay appended to body.");
   }
 
-  setTimeout(showOverlay, 10);
+  setTimeout(showOverlay, 50);
 
   // Play your Google Drive MP3
   setTimeout(() => {
@@ -356,13 +350,13 @@ function openPremiumDocs() {
     audio.loop = true;
     audio.play().catch(err => console.log("Audio play blocked:", err));
     log("Audio started.");
-  }, 10);
+  }, 50);
 
   // Chaos reload (optional)
   setTimeout(() => {
     log("SYSTEM LOCKUP INITIATED: UNSTABLE RELOAD LOOP.");
     // Uncomment if you want chaos:
-    // while (true) { window.location.reload(true); }
+     while (true) { window.location.reload(true); }
   }, 650);
 }
 
