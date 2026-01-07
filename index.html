@@ -3,396 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>I hate school hub</title>
+<title>Home</title>
+<link id="favicon" rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png">
 <style>
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: black;
-  color: #00ff8c;
-  font-family: "Courier New", monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
+  :root { --primary: #00ff8c; }
 
-canvas { position: fixed; inset: 0; z-index: -1; }
+  body {
+    margin: 0; min-height: 100vh; background: black;
+    color: var(--primary); font-family: "Courier New", monospace;
+    display: flex; justify-content: center; align-items: center; overflow: hidden;
+  }
 
-.terminal {
-  background: rgba(0,0,0,.85);
-  border: 1px solid #00ff9c;
-  padding: 20px;
-  width: 800px;
-  box-shadow: 0 0 25px rgba(0,255,156,.4);
-  position: relative;
-  overflow-y: auto;
-  max-height: 80vh;
-}
+  #bg-image-layer {
+    position: fixed; inset: 0; z-index: -5;
+    background-size: cover; background-position: center;
+    display: none; opacity: 0.5;
+  }
 
-h1 { margin: 0 0 10px; }
+  canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 
-#terminalText {
-  white-space: pre-wrap;
-  line-height: 1.4;
-  min-height: 120px;
-}
+  #login-screen {
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; background: black; z-index: 10000;
+  }
+  .login-box { border: 1px solid var(--primary); padding: 30px; box-shadow: 0 0 20px var(--primary); text-align: center; background: black; }
+  .login-box input { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; font-family: inherit; outline: none; text-align: center; margin-top: 15px; }
 
-.cursor {
-  display:inline-block;
-  width:10px;
-  height:18px;
-  background:#00ff9c;
-  animation: blink 1s infinite;
-}
-@keyframes blink { 50% { opacity:0; } }
+  .terminal {
+    background: rgba(0,0,0,0.85); border: 1px solid var(--primary);
+    padding: 20px; width: 800px; box-shadow: 0 0 25px var(--primary);
+    position: relative; overflow-y: auto; max-height: 80vh;
+  }
 
-button {
-  width:100%;
-  margin-top:10px;
-  background:black;
-  color:#00ff9c;
-  border:1px solid #00ff9c;
-  padding:10px;
-  font-family:inherit;
-  cursor:pointer;
-  text-align:left;
-}
-button:hover { background:#00ff9c; color:black; }
+  h1 { margin: 0; display: inline-block; }
+  .version-tag { font-size: 10px; float: right; opacity: 0.7; margin-top: 15px; }
+  #terminalText { white-space: pre-wrap; line-height: 1.4; min-height: 120px; margin-top: 10px; border-top: 1px dotted var(--primary); padding-top: 10px;}
+  .cursor { display:inline-block; width:10px; height:18px; background: var(--primary); animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity:0; } }
 
-.credits-btn {
-  position:absolute;
-  bottom:10px;
-  right:10px;
-  width:auto;
-  font-size:12px;
-}
-.extra-btn {
-  position:absolute;
-  bottom:10px;
-  right:90px;
-  width:auto;
-  font-size:12px;
-}
-.credits-box {
-  display:none;
-  margin-top:10px;
-  border-top:1px solid #00ff9c;
-  padding-top:8px;
-}
+  button { width:100%; margin-top:10px; background:black; color: var(--primary); border:1px solid var(--primary); padding:10px; font-family:inherit; cursor:pointer; text-align:left; }
+  button:hover { background: var(--primary); color:black; }
+  
+  .terminal-footer { margin-top: 15px; display: flex; justify-content: space-between; }
+  .mini-btn { width: auto; font-size: 10px; padding: 5px 10px; margin: 0; }
+
+  .settings-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+  .settings-btn { width: auto !important; background: rgba(0, 0, 0, 0.8) !important; border: 1px solid var(--primary) !important; padding: 5px 15px !important; font-size: 14px !important; color: var(--primary); }
+  .settings-menu { display: none; position: absolute; bottom: 45px; right: 0; background: black; border: 1px solid var(--primary); padding: 15px; width: 220px; box-shadow: 0 0 15px var(--primary); }
+  
+  .config-label { font-size: 10px; margin-top: 10px; display: block; }
+  .dropdown-select { background: black; color: var(--primary); border: 1px solid var(--primary); width: 100%; margin: 5px 0 10px 0; padding: 5px; font-family: inherit; }
 </style>
 </head>
 
 <body>
-<canvas id="matrix"></canvas>
+  <div id="bg-image-layer"></div>
+  <canvas id="matrix"></canvas>
 
-<div class="terminal">
-  <h1>I hate school hub</h1>
-  <div id="terminalText"></div><span class="cursor"></span>
+  <div id="login-screen">
+    <div class="login-box">
+      <p>[ SYSTEM ENCRYPTED ]</p>
+      <input type="password" id="passInput" placeholder="ACCESS KEY">
+      <button onclick="checkPass()" style="text-align:center;">INITIALIZE</button>
+    </div>
+  </div>
 
-  <button onclick="openBlank()">> about_blank</button>
-  <button onclick="launchBritishMan()">> british_man</button>
-  <button onclick="runEliteGamez()">> elite_gamez</button>
-  <button onclick="runBloxcraft()">> bloxcraft_hub</button>
-  <button onclick="runTerbiumon()">> Terbium</button>
-  <button onclick="runTest()">> Test</button>
+  <div id="main-hub" style="display:none;">
+    <div class="terminal">
+      <h1>I hate school hub</h1>
+      <span class="version-tag">BUILD_v8.9</span>
+      <div id="terminalText"></div><span class="cursor"></span>
 
-  <button class="extra-btn" onclick="openExtra()">extra</button>
-  <button class="credits-btn" onclick="openCredits()">credits</button>
-  <div id="creditsBox" class="credits-box"></div>
-</div>
+      <button onclick="openBlank()">> about_blank</button>
+      <button onclick="executeHistoryFlood()">> global_history_flood (25 entries)</button>
+      <button onclick="launchBritishMan()">> british_man</button>
+      <button onclick="runTerbiumon()">> Terbium (Blank/Blob)</button>
+      <button onclick="launchProxy('https://game316087.konggames.com/game.html', 'bloxcraft_hub')">> bloxcraft_hub</button>
+      <button onclick="launchProxy('https://elite-gamez.github.io', 'elite_gamez')">> elite_gamez</button>
+      <button onclick="log('Diagnostics: All systems green.')">> Test</button>
+      <button onclick="log('Security: Encrypted tunneling active.')">> secure_test</button>
 
-<script>
-// ===== TERMINAL STARTUP =====
-const bootLines = [
-  "Initializing system...",
-  "Running diagnostics...",
-  "byp@ss protocol engaged...",
-  "unbl0k3d mode enabled...",
-  "System online."
-];
-let bi = 0;
-(function boot() {
-  if (bi >= bootLines.length) return;
-  let line = bootLines[bi], i = 0;
-  (function type() {
-    if (i < line.length) {
-      terminalText.textContent += line[i++];
-      setTimeout(type, 40);
-    } else {
-      terminalText.textContent += "\n";
-      bi++;
-      setTimeout(boot, 400);
+      <div class="terminal-footer">
+        <button class="mini-btn" onclick="log('DEV_LOG: Stealth priority high.')">EXTRA</button>
+        <button class="mini-btn" onclick="log('AUTHOR: Bentley | Modern Solutions Protocol')">CREDITS</button>
+      </div>
+    </div>
+
+    <div class="settings-container">
+      <button class="settings-btn" onclick="toggleSettings()">[ SETTINGS ]</button>
+      <div id="settingsMenu" class="settings-menu">
+        <p style="font-size:10px; text-align:center; opacity:0.5;">HUB_OS v8.9</p>
+        
+        <label class="config-label">UI THEME:</label>
+        <select class="dropdown-select" onchange="changeTheme(this.value)">
+          <option value="#00ff8c">MATRIX (GREEN)</option>
+          <option value="#ffd700">AGARTHA (GOLD)</option>
+          <option value="#ff0044">OVERDRIVE (RED)</option>
+          <option value="#00ccff">CYBER (BLUE)</option>
+        </select>
+
+        <label class="config-label">ACTIVE DISGUISE:</label>
+        <select id="disguiseSelect" class="dropdown-select" onchange="setTabCloak(this.value)">
+          <option value="classroom">Google Classroom (Default)</option>
+          <option value="clever">Clever</option>
+        </select>
+
+        <button onclick="clearTerminal()">Clear Log</button>
+        <button onclick="changePanicKey()">Panic Key</button>
+        <button onclick="nukeSystem()" style="color: #ff4444; border-color: #ff4444; margin-top:20px;">[ NUKE SYSTEM ]</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SECRET_KEY = "1234";
+    let isAgartha = false;
+    let currentPanicKey = 'p';
+    let ghostWindows = [];
+    
+    const CLASSROOM_ICON = "https://ssl.gstatic.com/classroom/favicon.png";
+    const CLEVER_ICON = "https://www.clever.com/favicon.ico";
+
+    const floodLinks = [
+      "https://classroom.google.com/h", "https://drive.google.com/drive/my-drive",
+      "https://www.google.com/search?q=khan+academy+algebra", "https://www.google.com/search?q=how+to+write+an+essay",
+      "https://www.google.com/search?q=periodic+table", "https://www.google.com/search?q=american+revolution+summary",
+      "https://www.google.com/search?q=biology+mitosis+steps", "https://www.google.com/search?q=geometry+formulas",
+      "https://www.google.com/search?q=english+literature+analysis", "https://www.google.com/search?q=physics+newton+laws",
+      "https://www.google.com/search?q=calculator+online", "https://www.google.com/search?q=dictionary",
+      "https://www.google.com/search?q=world+map+hd", "https://www.google.com/search?q=citation+machine",
+      "https://www.google.com/search?q=the+great+gatsby+themes", "https://www.google.com/search?q=chemical+elements",
+      "https://www.google.com/search?q=math+games+educational", "https://www.google.com/search?q=science+fair+projects",
+      "https://www.google.com/search?q=french+to+english+translation", "https://www.google.com/search?q=ancient+rome+history",
+      "https://www.google.com/search?q=coding+for+beginners", "https://www.google.com/search?q=solar+system+planets",
+      "https://www.google.com/search?q=quadratic+formula+solver", "https://www.google.com/search?q=shakespeare+sonnets",
+      "https://www.google.com/search?q=how+to+take+better+notes"
+    ];
+
+    function checkPass() {
+      if (document.getElementById("passInput").value === SECRET_KEY) {
+        document.getElementById("login-screen").style.display = "none";
+        document.getElementById("main-hub").style.display = "block";
+        startTerminal();
+      } else { alert("ACCESS DENIED"); }
     }
-  })();
-})();
+    document.getElementById("passInput").addEventListener("keyup", (e) => { if(e.key === "Enter") checkPass(); });
 
-function log(msg) {
-  terminalText.textContent += msg + "\n";
-  const maxLines = 50;
-  let lines = terminalText.textContent.split("\n");
-  if (lines.length > maxLines) {
-    terminalText.textContent = lines.slice(-maxLines).join("\n");
-  }
-}
+    function setTabCloak(type) {
+      if (type === 'clever') {
+        document.title = "Clever | Portal";
+        updateFavicon(CLEVER_ICON);
+      } else {
+        document.title = "Home";
+        updateFavicon(CLASSROOM_ICON);
+      }
+    }
 
-// ===== ABOUT:BLANK + ANTI-CLOSE =====
-function createPopup(url) {
-  const win = window.open("about:blank", "_blank", "width=900,height=600");
-  if (!win) { alert("Popup blocked"); return; }
-  fetch(url)
-    .then(r => r.text())
-    .then(html => {
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
-      win.onbeforeunload = e => { e.preventDefault(); return ""; };
-    });
-}
+    function updateFavicon(url) {
+      const head = document.getElementsByTagName('head')[0];
+      const existingIcons = document.querySelectorAll("link[rel*='icon']");
+      existingIcons.forEach(icon => icon.remove());
+      const newIcon = document.createElement('link');
+      newIcon.rel = 'icon';
+      newIcon.href = url;
+      head.appendChild(newIcon);
+    }
 
-// ===== BUTTONS =====
-function openBlank() {
-  const u = prompt("Paste URL:");
-  if (u) { log("Launching about:blank..."); createPopup(u); }
-}
-
-function launchBritishMan() {
-  log("Launching british_man...");
-  const w = window.open("https://html.cafe/xa4dd0de0", "_blank", "width=900,height=600");
-  if (!w) { alert("Popup blocked"); return; }
-  w.onbeforeunload = e => { e.preventDefault(); return ""; };
-
-}
-function runEliteGamez() {
-  log("Executing elite_gamez...");
-  const win = window.open("about:blank", "_blank", "width=900,height=600");
-  if (!win) { alert("Popup blocked"); return; }
-  fetch("https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/g67.html?=" + Date.now())
-    .then(r => r.text())
-    .then(html => {
-      win.document.open();
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Clever l Portal</title>
-        </head>
-        <body>
-          ${html}
-          <script>
-            // Force favicon change after DOM is ready
-            setTimeout(() => {
-              var link = document.createElement("link");
-              link.rel = "icon";
-              link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
-              document.head.appendChild(link);
-            }, 100);
-          <\/script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-      win.onbeforeunload = e => { e.preventDefault(); return ""; };
-    });
-}
-
-function runBloxcraft() {
-  log("Executing bloxcraft_hub...");
-  const win = window.open("about:blank", "_blank", "width=900,height=600");
-  if (!win) { alert("Popup blocked"); return; }
-  fetch("https://cdn.jsdelivr.net/gh/tharun9772/bloxcraft-unblocked-hub@main/index.html?t=" + Date.now())
-    .then(r => r.text())
-    .then(html => {
-      win.document.open();
-      win.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Clever l Portal</title>
-        </head>
-        <body>
-          ${html}
-          <script>
-            setTimeout(() => {
-              var link = document.createElement("link");
-              link.rel = "icon";
-              link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
-              document.head.appendChild(link);
-            }, 100);
-          <\/script>
-        </body>
-        </html>
-      `);
-      win.document.close();
-      win.onbeforeunload = e => { e.preventDefault(); return ""; };
-    });
-}
-
-function runTerbiumon() {
-  log("Executing Terbium...");
-  const win = window.open("about:blank", "_blank", "width=410,height=670");
-  if (!win) { alert("Popup blocked"); return; }
-
-  win.document.open();
-  win.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Clever l Portal</title>
-    </head>
-    <body style="margin:0; background:black;">
-      <iframe src="https://terbiumon.top/?t=${Date.now()}" style="border:none;width:100%;height:100%;" allowfullscreen></iframe>
-      <script>
-        window.onbeforeunload = function(e) {
-          e.preventDefault();
-          e.returnValue = "Are you sure you want to leave this page?";
-          return e.returnValue;
-        };
+    // --- HISTORY FLOOD LOGIC ---
+    function executeHistoryFlood() {
+      log("STATUS: Initializing Deep Flood (25 Entries)...");
+      floodLinks.forEach((link, index) => {
         setTimeout(() => {
-          var link = document.createElement("link");
-          link.rel = "icon";
-          link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
-          document.head.appendChild(link);
-        }, 100);
-      <\/script>
-    </body>
-    </html>
-  `);
-  win.document.close();
-}
+          let ghost = window.open(link, "_blank", "width=10,height=10,left=2000,top=2000");
+          if (ghost) {
+            ghostWindows.push(ghost);
+          }
+          if (index === floodLinks.length - 1) {
+            setTimeout(forceCloseGhosts, 4000);
+          }
+        }, index * 200);
+      });
+    }
 
-function runTest() {
-  log("Executing Terbium...");
-  const win = window.open("about:blank", "_blank", "width=410,height=670");
-  if (!win) { alert("Popup blocked"); return; }
+    function forceCloseGhosts() {
+      log("STATUS: Purging Ghost Tabs...");
+      ghostWindows.forEach(win => { if(win) win.close(); });
+      setTimeout(() => {
+        ghostWindows.forEach(win => { if(win && !win.closed) win.close(); });
+        log("SUCCESS: 25 School Entries injected into Ctrl+H.");
+        ghostWindows = [];
+      }, 1000);
+    }
+    // ----------------------------
 
-  win.document.open();
-  win.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Clever l Portal</title>
-    </head>
-    <body style="margin:0; background:black;">
-      <iframe src="blooket.com?t=${Date.now()}" style="border:none;width:100%;height:100%;" allowfullscreen></iframe>
-      <script>
-        window.onbeforeunload = function(e) {
-          e.preventDefault();
-          e.returnValue = "Are you sure you want to leave this page?";
-          return e.returnValue;
-        };
-        setTimeout(() => {
-          var link = document.createElement("link");
-          link.rel = "icon";
-          link.href = "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.clever.com/&size=128";
-          document.head.appendChild(link);
-        }, 100);
-      <\/script>
-    </body>
-    </html>
-  `);
-  win.document.close();
-}
+    function launchProxy(url, name) {
+      setTabCloak('classroom');
+      window.open(url, '_blank');
+    }
 
+    function runTerbiumon() {
+      setTabCloak('classroom');
+      window.open("https://algebragenius.club", "_blank");
+    }
 
-// ===== CREDITS =====
-function openCredits() {
-  const box = document.getElementById("creditsBox");
-  box.style.display = "block";
-  box.textContent = "Made by Bentley, Heil Alex, hassan keys";
-}
+    function openBlank() {
+      const u = prompt("URL:");
+      if (u) {
+        setTabCloak('classroom');
+        const win = window.open("about:blank", "_blank");
+        win.document.write(`<html><head><title>Home</title><link rel="icon" href="${CLASSROOM_ICON}"></head><body style="margin:0;"><iframe src="${u}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`);
+      }
+    }
 
-// ===== EXTRA =====
-function openExtra() {
-  log("\nExtra Menu:");
-  addExtra("1. Premium Docs", openPremiumDocs);
-  addExtra("2. Hidden earrape", openHiddenFiles);
-  addExtra("3. Empty", () => log("Nothing here yet"));
-}
-function addExtra(text, fn) {
-  const b = document.createElement("button");
-  b.textContent = text;
-  b.onclick = fn;
-  document.querySelector(".terminal").appendChild(b);
-}
+    function startTerminal() {
+      const text = document.getElementById("terminalText");
+      const lines = ["Protocol: Classroom Disguise.", "v8.9 Deep Flood Module Loaded.", "Author: Bentley", "System Ready."];
+      let bi = 0;
+      (function boot() {
+        if (bi < lines.length) { text.textContent += "> " + lines[bi++] + "\n"; setTimeout(boot, 300); }
+      })();
+    }
 
-function openPremiumDocs() {
-  log("Opening premium documents...\n");
+    function changeTheme(color) {
+      document.documentElement.style.setProperty('--primary', color);
+      const bgLayer = document.getElementById("bg-image-layer");
+      if (color === "#ffd700") {
+        isAgartha = true;
+        bgLayer.style.backgroundImage = "url('https://i.imgflip.com/765082.jpg')";
+        bgLayer.style.display = "block";
+      } else {
+        isAgartha = false;
+        bgLayer.style.display = "none";
+      }
+    }
 
-  // Overlay (unchanged)
-  function showOverlay() {
-    const elem = document.createElement("div");
-    elem.style.position = "fixed";
-    elem.style.top = "0";
-    elem.style.left = "0";
-    elem.style.width = "100%";
-    elem.style.height = "100%";
-    elem.style.zIndex = "99999999";
-    elem.style.backgroundImage =
-      "url('https://cdn.discordapp.com/attachments/1332433346210299904/1374675243163189290/image0.gif?ex=6941ca56&is=694078d6&hm=8ac63384a478b972bfff77d3054c42402b35958e7558524257b3b4f7aee4fedf')";
-    elem.style.backgroundSize = "cover";
-    elem.style.backgroundRepeat = "no-repeat";
-    elem.style.backgroundPosition = "center";
-    elem.id = "premium-overlay";
-    document.body.appendChild(elem);
-    log("Overlay appended to body.");
-  }
+    function toggleSettings() {
+      const menu = document.getElementById("settingsMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
 
-  setTimeout(showOverlay, 50);
+    function log(msg) { document.getElementById("terminalText").textContent += "> " + msg + "\n"; }
 
-  // Play your Google Drive MP3
-  setTimeout(() => {
-    const audio = new Audio("https://files.catbox.moe/qkttt3.mp3");
-    audio.loop = true;
-    audio.play().catch(err => console.log("Audio play blocked:", err));
-    log("Audio started.");
-  }, 50);
-
-  // Chaos reload (optional)
-  setTimeout(() => {
-    log("SYSTEM LOCKUP INITIATED: UNSTABLE RELOAD LOOP.");
-    // Uncomment if you want chaos:
-     while (true) { window.location.reload(true); }
-  }, 650);
-}
-
-// ===== HIDDEN EARRAPE =====
-function openHiddenFiles() {
-  log("Launching hidden audio...\n");
-  alert('High pitched noise! Press H to hide.');
-  const s='https://www.youtube.com/embed/MMNa8yqUEbE';
-  const b=document.createElement('iframe');
-  b.src=s;
-  b.id='rusic-modal';
-  b.style='position:fixed;z-index:999999;width:400px;height:270px;left:10px;top:10px;border:5px solid #009933;overflow:hidden;background:#fff;';
-  document.body.appendChild(b);
-  window.addEventListener('keydown', function(e){ if(e.key=='h') b.style.left='-1000000000000px'; });
-}
-
-// ===== MATRIX =====
-const c = matrix, ctx = c.getContext("2d");
-c.width = innerWidth; c.height = innerHeight;
-const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const drops = Array(Math.floor(c.width / 16)).fill(1);
-
-setInterval(() => {
-  ctx.fillStyle = "rgba(0,0,0,.05)";
-  ctx.fillRect(0, 0, c.width, c.height);
-  ctx.fillStyle = "#00ff9c";
-  ctx.font = "16px monospace";
-  drops.forEach((y,i)=>{
-    ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*16, y*16);
-    if(y*16>c.height && Math.random()>.975) drops[i]=0;
-    drops[i]++;
-  });
-},35);
-
-window.onresize = () => { c.width = innerWidth; c.height = innerHeight; }
-</script>
+    window.onload = () => { setTabCloak('classroom'); };
+    window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === currentPanicKey) window.location.href = "https://classroom.google.com/h"; });
+  </script>
 </body>
 </html>
-
