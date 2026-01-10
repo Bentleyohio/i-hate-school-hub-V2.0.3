@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clever | Portal</title>
-<link id="dynamic-favicon" rel="shortcut icon" href="https://www.clever.com/favicon.ico">
+<link rel="icon" type="image/x-icon" href="https://www.clever.com/favicon.ico" />
+<script src="https://cdn.jsdelivr.net/gh/Parcoil/cloak@main/src/index.min.js"></script>
 <style>
   :root { --primary: #00ff8c; }
   body { margin: 0; min-height: 100vh; background: black; color: var(--primary); font-family: "Courier New", monospace; display: flex; justify-content: center; align-items: center; overflow: hidden; }
@@ -53,7 +54,7 @@
       <button onclick="openBlank()">> about_blank</button>
       <button onclick="launchBritishMan()">> british_man</button>
       <button onclick="runTerbiumon()">> Terbium (Blank/Blob)</button>
-      <button onclick="launchProxy('https://game316087.konggames.com/game.html', 'bloxcraft_hub')">> bloxcraft_hub</button>
+       <button onclick="launchProxy('https://game316087.konggames.com/game.html', 'bloxcraft_hub')">> bloxcraft_hub</button>
       <button onclick="launchProxy('https://elite-gamez.github.io', 'elite_gamez')">> elite_gamez</button>
       <div class="terminal-footer">
         <button class="mini-btn" onclick="log('STATUS: Operational')">STATUS</button>
@@ -71,15 +72,20 @@
           <option value="#ff0044">OVERDRIVE (RED)</option>
           <option value="#00ccff">CYBER (BLUE)</option>
         </select>
-        <label class="config-label">ACTIVE DISGUISE:</label>
-        <select id="disguiseSelect" class="dropdown-select" onchange="setTabCloak(this.value)">
-          <option value="clever">Clever</option>
-          <option value="classroom">Google Classroom</option>
+       <select name="cloak" data-cloak-select class="dropdown-select">
+  <option value="default">Default (Clever)</option>
+  <option value="classroom">Google Classroom</option>
+  <option value="drive">Google Drive</option>
+  <option value="canvas">Canvas</option>
+</select>
         </select>
         <button id="ghostBtn" onclick="toggleGhostMode()">Enable Ghost Mode</button>
         <button id="matrixBtn" onclick="toggleMatrix()">Disable Matrix Lines</button>
         <button onclick="clearTerminal()">Clear Log</button>
         <button onclick="changePanicKey()">Panic Key</button>
+        <button onclick="launchFullTest()" style="color: #ffd700; border-color: #ffd700;">
+  > LAUNCH IN NEW TAB (STABILITY TEST)
+</button>
         <button onclick="nukeSystem()" style="color: #ff4444; border-color: #ff4444; margin-top:20px;">[ NUKE SYSTEM ]</button>
       </div>
     </div>
@@ -129,16 +135,29 @@
         }
     });
 
-    function setTabCloak(type) {
-      const isClever = (type === 'clever');
-      document.title = isClever ? "Clever | Portal" : "Home";
-      const icon = isClever ? "https://www.clever.com/favicon.ico" : "https://ssl.gstatic.com/classroom/favicon.png";
-      const head = document.getElementsByTagName('head')[0];
-      document.querySelectorAll("link[rel*='icon']").forEach(l => head.removeChild(l));
-      const newL = document.createElement('link'); newL.rel='shortcut icon'; newL.href=icon;
-      head.appendChild(newL);
-      log("Cloak: " + type);
+const cloaks = [
+  { name: "default", icon: "https://www.clever.com/favicon.ico", title: "Clever | Portal" },
+  { name: "classroom", icon: "https://ssl.gstatic.com/classroom/favicon.png", title: "Classes" },
+  { name: "drive", icon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png", title: "My Drive - Google Drive" },
+  { name: "canvas", icon: "https://static.canva.com/static/images/favicon.ico", title: "Dashboard" }
+];
+
+// Force refresh favicon when Cloak.js triggers
+document.addEventListener('change', (e) => {
+    if (e.target.hasAttribute('data-cloak-select')) {
+        const activeCloak = cloaks.find(c => c.name === e.target.value);
+        if (activeCloak) {
+            let link = document.querySelector("link[rel*='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'shortcut icon';
+                document.head.appendChild(link);
+            }
+            link.href = activeCloak.icon;
+            log("Manual Icon Refresh: " + activeCloak.name);
+        }
     }
+});
 
     function runTerbiumon() {
       const overlay = document.createElement("div"); overlay.className = "choice-overlay";
@@ -165,6 +184,33 @@
         m.document.close();
       }
     }
+    
+    // This replaces your current setTabCloak function
+function applyCloakJS(type) {
+  const presets = {
+    'clever': { title: 'Clever | Portal', icon: 'https://www.clever.com/favicon.ico' },
+    'classroom': { title: 'Classes', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+    'drive': { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' }
+  };
+
+  const choice = presets[type];
+  if (!choice) return;
+
+  // 1. Update Title
+  document.title = choice.title;
+
+  // 2. CloakJS-style Favicon Injection
+  // We remove any existing icons to prevent the browser from getting confused
+  document.querySelectorAll("link[rel*='icon']").forEach(link => link.remove());
+
+  const newIcon = document.createElement('link');
+  newIcon.type = 'image/x-icon';
+  newIcon.rel = 'shortcut icon';
+  newIcon.href = choice.icon;
+  
+  document.getElementsByTagName('head')[0].appendChild(newIcon);
+  log("CloakJS: " + type + " active");
+}
 
     function openBlank() {
       const u = prompt("URL (include https://):");
@@ -213,6 +259,17 @@
     function launchBritishMan() { window.open("https://html.cafe/xa4dd0de0", "_blank"); }
     window.onresize = () => { c.width = innerWidth; c.height = innerHeight; };
     window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === currentPanicKey) window.location.href = "https://classroom.google.com/h"; });
+    
+    function launchFullTest() {
+    const currentCode = document.documentElement.outerHTML;
+    const newWin = window.open();
+    if (newWin) {
+        newWin.document.write(currentCode);
+        newWin.document.close();
+    } else {
+        alert("Pop-up blocked! Please allow pop-ups to test in a new tab.");
+    }
+}
 </script>
 </body>
 </html>
