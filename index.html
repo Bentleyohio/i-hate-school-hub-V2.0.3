@@ -1,276 +1,617 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Clever | Portal</title>
+
 <link rel="icon" type="image/x-icon" href="https://www.clever.com/favicon.ico" />
+
 <script src="https://cdn.jsdelivr.net/gh/Parcoil/cloak@main/src/index.min.js"></script>
+
 <style>
+
   :root { --primary: #00ff8c; }
+
   body { margin: 0; min-height: 100vh; background: black; color: var(--primary); font-family: "Courier New", monospace; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
   #bg-image-layer { position: fixed; inset: 0; z-index: -5; background-size: cover; background-position: center; display: none; opacity: 0.5; }
+
   canvas { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
   #login-screen { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: black; z-index: 10000; }
+
   .login-box { border: 1px solid var(--primary); padding: 30px; box-shadow: 0 0 20px var(--primary); text-align: center; background: black; }
+
   .login-box input { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 10px; font-family: inherit; outline: none; text-align: center; margin-top: 15px; }
+
   .terminal { background: rgba(0,0,0,0.85); border: 1px solid var(--primary); padding: 20px; width: 800px; box-shadow: 0 0 25px var(--primary); position: relative; overflow-y: auto; max-height: 80vh; }
+
   h1 { margin: 0; display: inline-block; }
+
   .version-tag { font-size: 10px; float: right; opacity: 0.7; margin-top: 15px; }
+
   #terminalText { white-space: pre-wrap; line-height: 1.4; min-height: 120px; margin-top: 10px; border-top: 1px dotted var(--primary); padding-top: 10px;}
+
   .cursor { display:inline-block; width:10px; height:18px; background: var(--primary); animation: blink 1s infinite; }
+
   @keyframes blink { 50% { opacity:0; } }
+
   button { width:100%; margin-top:10px; background:black; color: var(--primary); border:1px solid var(--primary); padding:10px; font-family:inherit; cursor:pointer; text-align:left; }
+
   button:hover { background: var(--primary); color:black; }
+
   .terminal-footer { margin-top: 15px; display: flex; justify-content: space-between; }
+
   .mini-btn { width: auto; font-size: 10px; padding: 5px 10px; margin: 0; }
+
   .settings-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+
   .settings-btn { width: auto !important; background: rgba(0, 0, 0, 0.8) !important; border: 1px solid var(--primary) !important; padding: 5px 15px !important; font-size: 14px !important; color: var(--primary); }
+
   .settings-menu { display: none; position: absolute; bottom: 45px; right: 0; background: black; border: 1px solid var(--primary); padding: 15px; width: 220px; box-shadow: 0 0 15px var(--primary); }
+
   .config-label { font-size: 10px; margin-top: 10px; display: block; }
+
   .dropdown-select { background: black; color: var(--primary); border: 1px solid var(--primary); width: 100%; margin: 5px 0 10px 0; padding: 5px; font-family: inherit; }
+
   .choice-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+
   .choice-box { background: black; border: 2px solid var(--primary); padding: 20px; text-align: center; box-shadow: 0 0 20px var(--primary); }
+
   .choice-box button { width: 120px; margin: 10px; display: inline-block; text-align: center; }
+
 </style>
+
 </head>
+
 <body>
+
+<div id="popup-overlay" style="display:none; position:fixed; inset:0; background:black; z-index:999999; justify-content:center; align-items:center; flex-direction:column;">
+
+   <img id="popup-gif" 
+
+     src="https://cdn.discordapp.com/attachments/1195182184840044545/1195184404016939088/trampo.gif?ex=6963abf7&is=69625a77&hm=e71607fc2a7a5c82326cc0f6eac60a35d5e9f999a4d7e382f2ff8a001e8385d7" 
+
+     style="width: 1000px; height: 912px; image-rendering: pixelated; object-fit: contain; max-height: 800vh; max-width: 800vw;">
+
+    <h1 id="popup-title" style="color:white; margin-top:20px;">SYSTEM OVERRIDE</h1>
+
+    <button onclick="closePopup()" style="width:auto; background:white; color:black; padding:10px 20px;">CLOSE</button>
+
+</div>
+
+
+
+<audio id="prank-audio" src="https://files.catbox.moe/qkttt3.mp3" preload="auto" loop></audio>
+
   <div id="bg-image-layer"></div>
+
   <canvas id="matrix"></canvas>
 
+
+
   <div id="login-screen">
+
     <div class="login-box">
+
       <p>[ SYSTEM ENCRYPTED ]</p>
+
       <input type="password" id="passInput" placeholder="ACCESS KEY" autocomplete="off">
+
       <button onclick="checkPass()">INITIALIZE</button>
+
     </div>
+
   </div>
+
+
 
   <div id="main-hub" style="display:none;">
+
     <div class="terminal">
+
       <h1>I hate school hub</h1>
+
       <span class="version-tag">BUILD_v9.1</span>
+
       <div id="terminalText"></div><span class="cursor"></span>
+
       <button onclick="openBlank()">> about_blank</button>
+
       <button onclick="launchBritishMan()">> british_man</button>
+
       <button onclick="runTerbiumon()">> Terbium (Blank/Blob)</button>
-       <button onclick="launchProxy('https://game316087.konggames.com/game.html', 'bloxcraft_hub')">> bloxcraft_hub</button>
-      <button onclick="launchProxy('https://elite-gamez.github.io', 'elite_gamez')">> elite_gamez</button>
-      <div class="terminal-footer">
-        <button class="mini-btn" onclick="log('STATUS: Operational')">STATUS</button>
-        <button class="mini-btn" onclick="log('AUTHOR: Bentley')">CREDITS</button>
-      </div>
-    </div>
-    <div class="settings-container">
-      <button class="settings-btn" onclick="toggleSettings()">[ SETTINGS ]</button>
-      <div id="settingsMenu" class="settings-menu">
-        <p style="font-size:10px; text-align:center; opacity:0.5;">HUB_OS v9.1</p>
-        <label class="config-label">UI THEME:</label>
-        <select class="dropdown-select" onchange="changeTheme(this.value)">
-          <option value="#00ff8c">MATRIX (GREEN)</option>
-          <option value="#ffd700">AGARTHA (GOLD)</option>
-          <option value="#ff0044">OVERDRIVE (RED)</option>
-          <option value="#00ccff">CYBER (BLUE)</option>
-        </select>
-       <select name="cloak" data-cloak-select class="dropdown-select">
-  <option value="default">Default (Clever)</option>
-  <option value="classroom">Google Classroom</option>
-  <option value="drive">Google Drive</option>
-  <option value="canvas">Canvas</option>
-</select>
-        </select>
-        <button id="ghostBtn" onclick="toggleGhostMode()">Enable Ghost Mode</button>
-        <button id="matrixBtn" onclick="toggleMatrix()">Disable Matrix Lines</button>
-        <button onclick="clearTerminal()">Clear Log</button>
-        <button onclick="changePanicKey()">Panic Key</button>
-        <button onclick="launchFullTest()" style="color: #ffd700; border-color: #ffd700;">
-  > LAUNCH IN NEW TAB (STABILITY TEST)
+
+      <button onclick="triggerPopup()" style="color: #ff6699; border-color: #ff6699;">
+
+  premium art neyton
+
 </button>
-        <button onclick="nukeSystem()" style="color: #ff4444; border-color: #ff4444; margin-top:20px;">[ NUKE SYSTEM ]</button>
+
+       <button onclick="launchProxy('https://game316087.konggames.com/game.html', 'bloxcraft_hub')">> bloxcraft_hub</button>
+
+      <button onclick="launchProxy('https://elite-gamez.github.io', 'elite_gamez')">> elite_gamez</button>
+
+      <div class="terminal-footer">
+
+        <button class="mini-btn" onclick="log('STATUS: Operational')">STATUS</button>
+
+        <button class="mini-btn" onclick="log('AUTHOR: Bentley')">CREDITS</button>
+
       </div>
+
     </div>
+
+    <div class="settings-container">
+
+      <button class="settings-btn" onclick="toggleSettings()">[ SETTINGS ]</button>
+
+      <div id="settingsMenu" class="settings-menu">
+
+        <p style="font-size:10px; text-align:center; opacity:0.5;">HUB_OS v9.1</p>
+
+        <label class="config-label">UI THEME:</label>
+
+        <select class="dropdown-select" onchange="changeTheme(this.value)">
+
+          <option value="#00ff8c">MATRIX (GREEN)</option>
+
+          <option value="#ffd700">AGARTHA (GOLD)</option>
+
+          <option value="#ff0044">OVERDRIVE (RED)</option>
+
+          <option value="#00ccff">CYBER (BLUE)</option>
+
+        </select>
+
+       <select name="cloak" data-cloak-select class="dropdown-select">
+
+  <option value="default">Default (Clever)</option>
+
+  <option value="classroom">Google Classroom</option>
+
+  <option value="drive">Google Drive</option>
+
+  <option value="canvas">Canvas</option>
+
+</select>
+
+        </select>
+
+        <button id="ghostBtn" onclick="toggleGhostMode()">Enable Ghost Mode</button>
+
+        <button id="matrixBtn" onclick="toggleMatrix()">Disable Matrix Lines</button>
+
+        <button onclick="clearTerminal()">Clear Log</button>
+
+        <button onclick="changePanicKey()">Panic Key</button>
+
+        <button onclick="launchFullTest()" style="color: #ffd700; border-color: #ffd700;">
+
+  > LAUNCH IN NEW TAB (STABILITY TEST)
+
+</button>
+
+        <button onclick="nukeSystem()" style="color: #ff4444; border-color: #ff4444; margin-top:20px;">[ NUKE SYSTEM ]</button>
+
+      </div>
+
+    </div>
+
   </div>
 
+
+
 <script>
-    const SECRET_KEY = "1234";
-    let isAgartha = false;
-    let currentPanicKey = 'p';
-    let matrixEnabled = true;
-    let ghostModeActive = false;
-    let systemUnlocked = false;
-
-    function checkPass() {
-      if (document.getElementById("passInput").value === SECRET_KEY) {
-        systemUnlocked = true;
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("main-hub").style.display = "block";
-        startTerminal();
-      } else { alert("ACCESS DENIED"); }
-    }
-    document.getElementById("passInput").addEventListener("keyup", (e) => { if(e.key === "Enter") checkPass(); });
-
-    function changeTheme(color) {
-      document.documentElement.style.setProperty('--primary', color);
-      const bgLayer = document.getElementById("bg-image-layer");
-      if (color === "#ffd700") {
+function changeTheme(color) {
+    document.documentElement.style.setProperty('--primary', color);
+    const bgLayer = document.getElementById('bg-image-layer');
+    
+    if (color === '#ffd700') {
         isAgartha = true;
-        bgLayer.style.backgroundImage = "url('https://i.imgflip.com/765082.jpg')";
+        // Agartha Background Logic
+        bgLayer.style.backgroundImage = "url('https://tse3.mm.bing.net/th/id/OIP.rqApdm2XEWPZGtF0w_QRowHaEK?rs=1&pid=ImgDetMain&o=7&rm=3')"; // Replace with your Agartha image link
         bgLayer.style.display = "block";
-      } else {
+        log("THEME_UPDATE: AGARTHA_PROTOCOL_ACTIVE");
+    } else {
         isAgartha = false;
         bgLayer.style.display = "none";
-      }
-      log("Theme Updated.");
+        log("THEME_UPDATE: SET_TO_" + color);
     }
-
-    function toggleGhostMode() {
-        ghostModeActive = !ghostModeActive;
-        document.getElementById("ghostBtn").textContent = ghostModeActive ? "Disable Ghost Mode" : "Enable Ghost Mode";
-        log("Ghost Mode: " + (ghostModeActive ? "ENABLED" : "DISABLED"));
-    }
-
-    window.addEventListener('blur', function() {
-        if(ghostModeActive && systemUnlocked) {
-            window.location.href = "https://classroom.google.com/h";
-        }
-    });
-
-const cloaks = [
-  { name: "default", icon: "https://www.clever.com/favicon.ico", title: "Clever | Portal" },
-  { name: "classroom", icon: "https://ssl.gstatic.com/classroom/favicon.png", title: "Classes" },
-  { name: "drive", icon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png", title: "My Drive - Google Drive" },
-  { name: "canvas", icon: "https://static.canva.com/static/images/favicon.ico", title: "Dashboard" }
-];
-
-// Force refresh favicon when Cloak.js triggers
-document.addEventListener('change', (e) => {
-    if (e.target.hasAttribute('data-cloak-select')) {
-        const activeCloak = cloaks.find(c => c.name === e.target.value);
-        if (activeCloak) {
-            let link = document.querySelector("link[rel*='icon']");
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'shortcut icon';
-                document.head.appendChild(link);
-            }
-            link.href = activeCloak.icon;
-            log("Manual Icon Refresh: " + activeCloak.name);
-        }
-    }
-});
-
-    function runTerbiumon() {
-      const overlay = document.createElement("div"); overlay.className = "choice-overlay";
-      overlay.innerHTML = `<div class="choice-box"><p>METHOD:</p><button id="b1">> blank</button><button id="b2">> blob</button><br><button id="bc" style="color:red;border-color:red;">CANCEL</button></div>`;
-      document.body.appendChild(overlay);
-      document.getElementById("b1").onclick = () => { document.body.removeChild(overlay); launchTerbium("blank"); };
-      document.getElementById("b2").onclick = () => { document.body.removeChild(overlay); launchTerbium("blob"); };
-      document.getElementById("bc").onclick = () => document.body.removeChild(overlay);
-    }
-
-    function launchTerbium(method) {
-      const siteUrl = "https://algebragenius.club"; 
-      const frameHtml = `<html><head><title>Home</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"></head><body style="margin:0;overflow:hidden;"><iframe src="${siteUrl}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`;
-      if (method === "blank") {
-        const win = window.open("about:blank", "_blank");
-        win.document.write(frameHtml); win.document.close();
-      } else {
-        const blob = new Blob([frameHtml], { type: 'text/html' });
-        const bUrl = URL.createObjectURL(blob);
-        const m = window.open("", "_blank");
-        // FIXED syntax below to prevent W3Schools "orange text" error
-        const fakePage = '<html><head><title>Sign in</title></head><body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#fff;"><div style="text-align:center;border:1px solid #dadce0;padding:40px;border-radius:8px;max-width:400px;"><img src="https://ssl.gstatic.com/classroom/favicon.png" width="48"><h1>Sign in</h1><p style="color:#5f6368">Use your Google Account</p><button id="go" style="background:#1a73e8;color:white;border:none;padding:10px 24px;cursor:pointer;border-radius:4px;font-weight:500;margin-top:20px;">Continue</button></div><script>window.onbeforeunload=function(){window.location.href="https://classroom.google.com/h";};document.getElementById("go").onclick=function(){window.open("' + bUrl + '","_blank");window.location.href="https://classroom.google.com/h";};<\/script></body></html>';
-        m.document.write(fakePage);
-        m.document.close();
-      }
-    }
-    
-    // This replaces your current setTabCloak function
-function applyCloakJS(type) {
-  const presets = {
-    'clever': { title: 'Clever | Portal', icon: 'https://www.clever.com/favicon.ico' },
-    'classroom': { title: 'Classes', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
-    'drive': { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' }
-  };
-
-  const choice = presets[type];
-  if (!choice) return;
-
-  // 1. Update Title
-  document.title = choice.title;
-
-  // 2. CloakJS-style Favicon Injection
-  // We remove any existing icons to prevent the browser from getting confused
-  document.querySelectorAll("link[rel*='icon']").forEach(link => link.remove());
-
-  const newIcon = document.createElement('link');
-  newIcon.type = 'image/x-icon';
-  newIcon.rel = 'shortcut icon';
-  newIcon.href = choice.icon;
-  
-  document.getElementsByTagName('head')[0].appendChild(newIcon);
-  log("CloakJS: " + type + " active");
 }
 
-    function openBlank() {
-      const u = prompt("URL (include https://):");
-      if (u) {
-        const win = window.open("about:blank", "_blank");
-        win.document.write('<html><head><title>Home</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"></head><body style="margin:0;"><iframe src="' + u + '" style="width:100%;height:100vh;border:none;"></iframe></body></html>');
-        win.document.close();
-      }
+// Ensure the dropdown actually triggers the function
+document.querySelector('.dropdown-select').addEventListener('change', (e) => {
+    changeTheme(e.target.value);
+});
+
+function triggerPopup() {
+    const overlay = document.getElementById('popup-overlay');
+    overlay.style.display = 'flex';
+
+    // 1. Play Audio (using the Catbox link that works for you)
+    const audio = new Audio("https://files.catbox.moe/qkttt3.mp3");
+    audio.loop = true;
+    audio.play().catch(err => console.log("Audio needs a click to start."));
+
+    log("Executing: Premium Art Neyton [v11.2]");
+
+    // 2. The Chaos Timer
+    setTimeout(() => {
+        log("SYSTEM LOCKUP INITIATED...");
+
+        // ==========================================
+        // TO ENABLE THE CRASH: Remove the "//" below
+         while(true) { window.location.reload(true); } 
+        // ==========================================
+        
+    }, 650);
+}
+
+
+
+
+
+
+    const SECRET_KEY = "1234";
+
+    let isAgartha = false;
+
+    let currentPanicKey = 'p';
+
+    let matrixEnabled = true;
+
+    let ghostModeActive = false;
+
+    let systemUnlocked = false;
+
+
+
+    function checkPass() {
+
+      if (document.getElementById("passInput").value === SECRET_KEY) {
+
+        systemUnlocked = true;
+
+        document.getElementById("login-screen").style.display = "none";
+
+        document.getElementById("main-hub").style.display = "block";
+
+        startTerminal();
+
+      } else { alert("ACCESS DENIED"); }
+
     }
 
+    document.getElementById("passInput").addEventListener("keyup", (e) => { if(e.key === "Enter") checkPass(); });
+
+
+
+
+
+
+
+    function toggleGhostMode() {
+
+        ghostModeActive = !ghostModeActive;
+
+        document.getElementById("ghostBtn").textContent = ghostModeActive ? "Disable Ghost Mode" : "Enable Ghost Mode";
+
+        log("Ghost Mode: " + (ghostModeActive ? "ENABLED" : "DISABLED"));
+
+    }
+
+
+
+    window.addEventListener('blur', function() {
+
+        if(ghostModeActive && systemUnlocked) {
+
+            window.location.href = "https://classroom.google.com/h";
+
+        }
+
+    });
+
+
+
+const cloaks = [
+
+  { name: "default", icon: "https://www.clever.com/favicon.ico", title: "Clever | Portal" },
+
+  { name: "classroom", icon: "https://ssl.gstatic.com/classroom/favicon.png", title: "Classes" },
+
+  { name: "drive", icon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png", title: "My Drive - Google Drive" },
+
+  { name: "canvas", icon: "https://static.canva.com/static/images/favicon.ico", title: "Dashboard" }
+
+];
+
+
+
+// Force refresh favicon when Cloak.js triggers
+
+document.addEventListener('change', (e) => {
+
+    if (e.target.hasAttribute('data-cloak-select')) {
+
+        const activeCloak = cloaks.find(c => c.name === e.target.value);
+
+        if (activeCloak) {
+
+            let link = document.querySelector("link[rel*='icon']");
+
+            if (!link) {
+
+                link = document.createElement('link');
+
+                link.rel = 'shortcut icon';
+
+                document.head.appendChild(link);
+
+            }
+
+            link.href = activeCloak.icon;
+
+            log("Manual Icon Refresh: " + activeCloak.name);
+
+        }
+
+    }
+
+});
+
+
+
+    function runTerbiumon() {
+
+      const overlay = document.createElement("div"); overlay.className = "choice-overlay";
+
+      overlay.innerHTML = `<div class="choice-box"><p>METHOD:</p><button id="b1">> blank</button><button id="b2">> blob</button><br><button id="bc" style="color:red;border-color:red;">CANCEL</button></div>`;
+
+      document.body.appendChild(overlay);
+
+      document.getElementById("b1").onclick = () => { document.body.removeChild(overlay); launchTerbium("blank"); };
+
+      document.getElementById("b2").onclick = () => { document.body.removeChild(overlay); launchTerbium("blob"); };
+
+      document.getElementById("bc").onclick = () => document.body.removeChild(overlay);
+
+    }
+
+
+
+    function launchTerbium(method) {
+
+      const siteUrl = "https://algebragenius.club"; 
+
+      const frameHtml = `<html><head><title>Home</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"></head><body style="margin:0;overflow:hidden;"><iframe src="${siteUrl}" style="width:100%;height:100vh;border:none;"></iframe></body></html>`;
+
+      if (method === "blank") {
+
+        const win = window.open("about:blank", "_blank");
+
+        win.document.write(frameHtml); win.document.close();
+
+      } else {
+
+        const blob = new Blob([frameHtml], { type: 'text/html' });
+
+        const bUrl = URL.createObjectURL(blob);
+
+        const m = window.open("", "_blank");
+
+        // FIXED syntax below to prevent W3Schools "orange text" error
+
+        const fakePage = '<html><head><title>Sign in</title></head><body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#fff;"><div style="text-align:center;border:1px solid #dadce0;padding:40px;border-radius:8px;max-width:400px;"><img src="https://ssl.gstatic.com/classroom/favicon.png" width="48"><h1>Sign in</h1><p style="color:#5f6368">Use your Google Account</p><button id="go" style="background:#1a73e8;color:white;border:none;padding:10px 24px;cursor:pointer;border-radius:4px;font-weight:500;margin-top:20px;">Continue</button></div><script>window.onbeforeunload=function(){window.location.href="https://classroom.google.com/h";};document.getElementById("go").onclick=function(){window.open("' + bUrl + '","_blank");window.location.href="https://classroom.google.com/h";};<\/script></body></html>';
+
+        m.document.write(fakePage);
+
+        m.document.close();
+
+      }
+
+    }
+
+    
+
+    // This replaces your current setTabCloak function
+
+function applyCloakJS(type) {
+
+  const presets = {
+
+    'clever': { title: 'Clever | Portal', icon: 'https://www.clever.com/favicon.ico' },
+
+    'classroom': { title: 'Classes', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+
+    'drive': { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' }
+
+  };
+
+
+
+  const choice = presets[type];
+
+  if (!choice) return;
+
+
+
+  // 1. Update Title
+
+  document.title = choice.title;
+
+
+
+  // 2. CloakJS-style Favicon Injection
+
+  // We remove any existing icons to prevent the browser from getting confused
+
+  document.querySelectorAll("link[rel*='icon']").forEach(link => link.remove());
+
+
+
+  const newIcon = document.createElement('link');
+
+  newIcon.type = 'image/x-icon';
+
+  newIcon.rel = 'shortcut icon';
+
+  newIcon.href = choice.icon;
+
+  
+
+  document.getElementsByTagName('head')[0].appendChild(newIcon);
+
+  log("CloakJS: " + type + " active");
+
+}
+
+
+
+    function openBlank() {
+
+      const u = prompt("URL (include https://):");
+
+      if (u) {
+
+        const win = window.open("about:blank", "_blank");
+
+        win.document.write('<html><head><title>Home</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"></head><body style="margin:0;"><iframe src="' + u + '" style="width:100%;height:100vh;border:none;"></iframe></body></html>');
+
+        win.document.close();
+
+      }
+
+    }
+
+
+
     const c = document.getElementById("matrix"), ctx = c.getContext("2d");
+
     c.width = innerWidth; c.height = innerHeight;
+
     const drops = Array(Math.floor(c.width / 16)).fill(1);
+
     function draw() {
+
       if (!matrixEnabled) return;
+
       if (isAgartha) ctx.clearRect(0,0,c.width,c.height);
+
       else { ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,c.width,c.height); }
+
       ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+
       ctx.font = "16px monospace";
+
       drops.forEach((y, i) => {
+
         ctx.fillText(Math.floor(Math.random()*2), i * 16, y * 16);
+
+        if (y * 16 > c.height && Math.random() > 0.975) drops[i] = 0;
+
+        drops[i]++;
+
+      });
+
+    }
+
+    setInterval(draw, 35);
+
+function draw() {
+    if (!matrixEnabled) return;
+
+    // Agartha uses a clean background, Matrix uses a fading trail
+    if (isAgartha) {
+        ctx.clearRect(0, 0, c.width, c.height);
+    } else {
+        ctx.fillStyle = "rgba(0,0,0,0.05)";
+        ctx.fillRect(0, 0, c.width, c.height);
+    }
+
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
+    ctx.font = "16px monospace";
+    
+    drops.forEach((y, i) => {
+        ctx.fillText(Math.floor(Math.random() * 2), i * 16, y * 16);
         if (y * 16 > c.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       });
-    }
-    setInterval(draw, 35);
+}
 
     function toggleMatrix() {
+
       matrixEnabled = !matrixEnabled;
+
       document.getElementById("matrix").style.display = matrixEnabled ? "block" : "none";
+
       document.getElementById("matrixBtn").textContent = matrixEnabled ? "Disable Matrix Lines" : "Enable Matrix Lines";
+
     }
+
+
 
     function startTerminal() {
-      const text = document.getElementById("terminalText");
-      const lines = ["v9.1 Fixed Build Online.", "Ghost Module Initialized.", "Access Granted."];
-      let bi = 0; text.textContent = "";
-      (function boot() { if (bi < lines.length) { text.textContent += "> " + lines[bi++] + "\n"; setTimeout(boot, 200); } })();
-    }
-    function log(msg) { document.getElementById("terminalText").textContent += "> " + msg + "\n"; }
-    function toggleSettings() { const m = document.getElementById("settingsMenu"); m.style.display = (m.style.display === "block") ? "none" : "block"; }
-    function clearTerminal() { document.getElementById("terminalText").textContent = "> Logs purged.\n"; }
-    function nukeSystem() { document.body.innerHTML = "<h1>404 Not Found</h1>"; setTimeout(() => window.location.href="https://google.com", 500); }
-    function changePanicKey() { const k = prompt("New Key:"); if(k) currentPanicKey = k.toLowerCase(); }
-    function launchProxy(u, n) { log("Launching " + n); window.open(u, '_blank'); }
-    function launchBritishMan() { window.open("https://html.cafe/xa4dd0de0", "_blank"); }
-    window.onresize = () => { c.width = innerWidth; c.height = innerHeight; };
-    window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === currentPanicKey) window.location.href = "https://classroom.google.com/h"; });
-    
-    function launchFullTest() {
-    const currentCode = document.documentElement.outerHTML;
-    const newWin = window.open();
-    if (newWin) {
-        newWin.document.write(currentCode);
-        newWin.document.close();
-    } else {
-        alert("Pop-up blocked! Please allow pop-ups to test in a new tab.");
-    }
-}
-</script>
-</body>
-</html>
 
+      const text = document.getElementById("terminalText");
+
+      const lines = ["v9.1 Fixed Build Online.", "Ghost Module Initialized.", "Access Granted."];
+
+      let bi = 0; text.textContent = "";
+
+      (function boot() { if (bi < lines.length) { text.textContent += "> " + lines[bi++] + "\n"; setTimeout(boot, 200); } })();
+
+    }
+
+    function log(msg) { document.getElementById("terminalText").textContent += "> " + msg + "\n"; }
+
+    function toggleSettings() { const m = document.getElementById("settingsMenu"); m.style.display = (m.style.display === "block") ? "none" : "block"; }
+
+    function clearTerminal() { document.getElementById("terminalText").textContent = "> Logs purged.\n"; }
+
+    function nukeSystem() { document.body.innerHTML = "<h1>404 Not Found</h1>"; setTimeout(() => window.location.href="https://google.com", 500); }
+
+    function changePanicKey() { const k = prompt("New Key:"); if(k) currentPanicKey = k.toLowerCase(); }
+
+    function launchProxy(u, n) { log("Launching " + n); window.open(u, '_blank'); }
+
+    function launchBritishMan() { window.open("https://html.cafe/xa4dd0de0", "_blank"); }
+
+    window.onresize = () => { c.width = innerWidth; c.height = innerHeight; };
+
+    window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === currentPanicKey) window.location.href = "https://classroom.google.com/h"; });
+
+    
+
+    function launchFullTest() {
+
+    const currentCode = document.documentElement.outerHTML;
+
+    const newWin = window.open();
+
+    if (newWin) {
+
+        newWin.document.write(currentCode);
+
+        newWin.document.close();
+
+    } else {
+
+        alert("Pop-up blocked! Please allow pop-ups to test in a new tab.");
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
